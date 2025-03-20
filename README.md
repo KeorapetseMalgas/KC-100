@@ -3,11 +3,11 @@
 
 
 
-I am a recent Cybersecurity Fellowship graduate with a profound interest in Security research and a dedication to solving complex problems.
+I am a cybersecurity professional particulary interested in penetration testing,Vulnerability management,threat hunting and OSINT.Also a hacker who loves AI😉
 
 ## Objective
 
-My journey at Cybersafe Foundation has led me to develop a passion for cybersecurity,most passionate about offensive secuirty,web3 and blockchain technologies .All these fields encourage me to learn everyday and develop my skills.Besides Cybersecuirty is all about taking the effort to secure the digital realm,no teams here ,offensive or defensive we're all working towards the same goal. 
+My journey at Cybersafe Foundation has led me to develop a passion for cybersecurity,most passionate about offensive secuirty,OSINT nas AI .All these fields encourage me to learn everyday and develop my skills.Besides Cybersecuirty is all about taking the effort to secure the digital realm,no teams here ,offensive or defensive we're all working towards the same goal. 
 
 ## Skills
 
@@ -16,7 +16,7 @@ My journey at Cybersafe Foundation has led me to develop a passion for cybersecu
 |-----------------------------------------------|----------------------------|
 | Secure Code Review                            | <a href="https://www.linkedin.com/posts/keorapetse-malgas_openday-securecodereview-cybersecurity-activity-7231627282849689600-TIL6?utm_source=share&utm_medium=member_desktop">Linkedln post</a>|
 | Web app security using python libraries       | <a href="https://www.linkedin.com/posts/keorapetse-malgas_cybersecurity-cybergirl4-cybersafefoundation-activity-7261749128664113152-cgY-?utm_source=share&utm_medium=member_desktop">Linkedln post</a>|
-| Security Automation with Shuffle SOAR         | Let's Defend labs|
+| SOC +SIEM LAB                                 | Let's Defend labs|
 
 
 ## Tools I am Proficient in 😍💻
