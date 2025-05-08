@@ -1,9 +1,8 @@
 # # Hello, I'm KEORAPETSE😉
 <a href="https://www.linkedin.com/in/keorapetse-malgas-5ba1b421a/"><img src="https://img.shields.io/badge/-LinkedIn-0072b1?&style=for-the-badge&logo=linkedin&logoColor=white" /></a>
 
-
-
 I am a cybersecurity professional particulary interested in penetration testing,Vulnerability management,threat hunting and OSINT.Also a hacker who loves AI😉
+![Image](https://github.com/user-attachments/assets/0bab15a3-c90c-4bbf-9d9d-1b9a2ddbd139)
 
 
 
