@@ -5,7 +5,7 @@
 
 I am a cybersecurity professional particulary interested in penetration testing,Vulnerability management,threat hunting and OSINT.Also a hacker who loves AI😉
 
-[eJPT](https://github.com/user-attachments/assets/9d31cefa-184c-4469-ad8b-1ce440387914)
+
 
 #Objective !
 
