@@ -5,9 +5,11 @@
 
 I am a cybersecurity professional particulary interested in penetration testing,Vulnerability management,threat hunting and OSINT.Also a hacker who loves AI😉
 
-## Objective
+[eJPT](https://github.com/user-attachments/assets/9d31cefa-184c-4469-ad8b-1ce440387914)
 
-My journey at Cybersafe Foundation has led me to develop a passion for cybersecurity,most passionate about offensive secuirty,OSINT nas AI .All these fields encourage me to learn everyday and develop my skills.Besides Cybersecuirty is all about taking the effort to secure the digital realm,no teams here ,offensive or defensive we're all working towards the same goal. 
+#Objective !
+
+My journey at Cybersafe Foundation has led me to develop a passion for cybersecurity,most passionate about offensive secuirty,OSINT and AI .All these fields encourage me to learn everyday and develop my skills.Besides Cybersecuirty is all about taking the effort to secure the digital realm,no teams here ,offensive or defensive we're all working towards the same goal. 
 
 ## Skills
 
@@ -16,7 +18,7 @@ My journey at Cybersafe Foundation has led me to develop a passion for cybersecu
 |-----------------------------------------------|----------------------------|
 | Secure Code Review                            | <a href="https://www.linkedin.com/posts/keorapetse-malgas_openday-securecodereview-cybersecurity-activity-7231627282849689600-TIL6?utm_source=share&utm_medium=member_desktop">Linkedln post</a>|
 | Web app security using python libraries       | <a href="https://www.linkedin.com/posts/keorapetse-malgas_cybersecurity-cybergirl4-cybersafefoundation-activity-7261749128664113152-cgY-?utm_source=share&utm_medium=member_desktop">Linkedln post</a>|
-| SOC +SIEM LAB                                 | Let's Defend labs|
+| SOC +SIEM LAB                                 | https://medium.com/@KC100/home-soc-siem-monitoring-live-attacks-on-a-honeypot-6a3d67e21e05
 
 
 ## Tools I am Proficient in 😍💻
