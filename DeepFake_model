@@ -1,0 +1,919 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "gpuType": "T4"
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    },
+    "accelerator": "GPU"
+  },
+  "cells": [
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install opendatasets\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "zLXybGzkWYoD",
+        "outputId": "3f3150e2-be44-4d76-8c75-fb5474435a8e"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Collecting opendatasets\n",
+            "  Downloading opendatasets-0.1.22-py3-none-any.whl.metadata (9.2 kB)\n",
+            "Requirement already satisfied: tqdm in /usr/local/lib/python3.12/dist-packages (from opendatasets) (4.67.1)\n",
+            "Requirement already satisfied: kaggle in /usr/local/lib/python3.12/dist-packages (from opendatasets) (1.7.4.5)\n",
+            "Requirement already satisfied: click in /usr/local/lib/python3.12/dist-packages (from opendatasets) (8.3.0)\n",
+            "Requirement already satisfied: bleach in /usr/local/lib/python3.12/dist-packages (from kaggle->opendatasets) (6.2.0)\n",
+            "Requirement already satisfied: certifi>=14.05.14 in /usr/local/lib/python3.12/dist-packages (from kaggle->opendatasets) (2025.8.3)\n",
+            "Requirement already satisfied: charset-normalizer in /usr/local/lib/python3.12/dist-packages (from kaggle->opendatasets) (3.4.3)\n",
+            "Requirement already satisfied: idna in /usr/local/lib/python3.12/dist-packages (from kaggle->opendatasets) (3.10)\n",
+            "Requirement already satisfied: protobuf in /usr/local/lib/python3.12/dist-packages (from kaggle->opendatasets) (5.29.5)\n",
+            "Requirement already satisfied: python-dateutil>=2.5.3 in /usr/local/lib/python3.12/dist-packages (from kaggle->opendatasets) (2.9.0.post0)\n",
+            "Requirement already satisfied: python-slugify in /usr/local/lib/python3.12/dist-packages (from kaggle->opendatasets) (8.0.4)\n",
+            "Requirement already satisfied: requests in /usr/local/lib/python3.12/dist-packages (from kaggle->opendatasets) (2.32.4)\n",
+            "Requirement already satisfied: setuptools>=21.0.0 in /usr/local/lib/python3.12/dist-packages (from kaggle->opendatasets) (75.2.0)\n",
+            "Requirement already satisfied: six>=1.10 in /usr/local/lib/python3.12/dist-packages (from kaggle->opendatasets) (1.17.0)\n",
+            "Requirement already satisfied: text-unidecode in /usr/local/lib/python3.12/dist-packages (from kaggle->opendatasets) (1.3)\n",
+            "Requirement already satisfied: urllib3>=1.15.1 in /usr/local/lib/python3.12/dist-packages (from kaggle->opendatasets) (2.5.0)\n",
+            "Requirement already satisfied: webencodings in /usr/local/lib/python3.12/dist-packages (from kaggle->opendatasets) (0.5.1)\n",
+            "Downloading opendatasets-0.1.22-py3-none-any.whl (15 kB)\n",
+            "Installing collected packages: opendatasets\n",
+            "Successfully installed opendatasets-0.1.22\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import opendatasets as od\n",
+        "od.download(\"https://www.kaggle.com/datasets/manjilkarki/deepfake-and-real-images\")"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "qqQddxbErsG_",
+        "outputId": "23435add-3a87-4281-9697-095927fc9641"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Please provide your Kaggle credentials to download this dataset. Learn more: http://bit.ly/kaggle-creds\n",
+            "Your Kaggle username: genevieveuwimana\n",
+            "Your Kaggle Key: ··········\n",
+            "Dataset URL: https://www.kaggle.com/datasets/manjilkarki/deepfake-and-real-images\n",
+            "Downloading deepfake-and-real-images.zip to ./deepfake-and-real-images\n"
+          ]
+        },
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "100%|██████████| 1.68G/1.68G [00:19<00:00, 94.9MB/s]\n"
+          ]
+        },
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "2ZksIq3YEUUP"
+      },
+      "outputs": [],
+      "source": [
+        "import numpy as np\n",
+        "import pandas as pd\n",
+        "import os\n",
+        "import glob\n",
+        "import tensorflow as tf\n",
+        "import matplotlib.pyplot as plt\n",
+        "from keras.models import load_model\n",
+        "from keras.preprocessing import image\n",
+        "import seaborn as sns\n",
+        "from sklearn import metrics\n",
+        "from tensorflow.keras.preprocessing import image_dataset_from_directory\n",
+        "from tensorflow.keras.applications import Xception\n",
+        "from tensorflow.keras.layers import Dense, GlobalAveragePooling2D, Dropout\n",
+        "from tensorflow.keras.models import Model"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#Keo was removed where she started hhh!!!\n",
+        "# Define the root directory of your unzipped dataset\n",
+        "DATA_DIR = \"/content/deepfake-and-real-images/Dataset\"\n",
+        "\n",
+        "# Set parameters for image loading\n",
+        "BATCH_SIZE = 32\n",
+        "IMG_SIZE = (224, 224) # Common size for pre-trained models like VGG or ResNet"
+      ],
+      "metadata": {
+        "id": "gFYIRSW3VSXD"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from tensorflow.keras.applications.xception import Xception, preprocess_input\n",
+        "from tensorflow.keras.layers import GlobalAveragePooling2D, Dense, Dropout\n",
+        "from tensorflow.keras.models import Model\n",
+        "from tensorflow.keras.preprocessing import image_dataset_from_directory\n",
+        "import tensorflow as tf\n",
+        "\n",
+        "# Define the root directory of your unzipped dataset\n",
+        "DATA_DIR = \"/content/deepfake-and-real-images/Dataset\"\n",
+        "\n",
+        "# Set parameters for image loading\n",
+        "BATCH_SIZE = 32\n",
+        "IMG_SIZE = (224, 224) # Common size for pre-trained models like VGG or ResNet\n",
+        "\n",
+        "# -------------------------------\n",
+        "# 1. Load and preprocess data\n",
+        "# -------------------------------\n",
+        "train_ds = image_dataset_from_directory(\n",
+        "    DATA_DIR + '/Train',\n",
+        "    labels='inferred',\n",
+        "    label_mode='binary',\n",
+        "    batch_size=BATCH_SIZE,\n",
+        "    image_size=IMG_SIZE\n",
+        ").map(lambda x, y: (preprocess_input(x), y))\n",
+        "\n",
+        "test_ds = image_dataset_from_directory(\n",
+        "    DATA_DIR + '/Test',\n",
+        "    labels='inferred',\n",
+        "    label_mode='binary',\n",
+        "    batch_size=BATCH_SIZE,\n",
+        "    image_size=IMG_SIZE\n",
+        ").map(lambda x, y: (preprocess_input(x), y))\n",
+        "\n",
+        "# -------------------------------\n",
+        "# 2. Define data augmentation\n",
+        "# -------------------------------\n",
+        "data_augmentation = tf.keras.Sequential([\n",
+        "    tf.keras.layers.RandomFlip(\"horizontal\"),\n",
+        "    tf.keras.layers.RandomRotation(0.1),\n",
+        "    tf.keras.layers.RandomZoom(0.1)\n",
+        "])\n",
+        "\n",
+        "# -------------------------------\n",
+        "# 3. Build model architecture\n",
+        "# -------------------------------\n",
+        "base_model = Xception(\n",
+        "    weights='imagenet',\n",
+        "    include_top=False,\n",
+        "    input_shape=IMG_SIZE + (3,)\n",
+        ")\n",
+        "base_model.trainable = False  # Freeze base layers for now\n",
+        "\n",
+        "# Custom head\n",
+        "x = data_augmentation(base_model.input)\n",
+        "x = base_model(x)\n",
+        "x = GlobalAveragePooling2D()(x)\n",
+        "x = Dense(1024, activation='relu',\n",
+        "          kernel_initializer='he_normal',\n",
+        "          kernel_regularizer=tf.keras.regularizers.l2(0.01))(x)\n",
+        "x = Dropout(0.5)(x)\n",
+        "predictions = Dense(1, activation='sigmoid')(x)\n",
+        "\n",
+        "model = Model(inputs=base_model.input, outputs=predictions)\n",
+        "\n",
+        "# -------------------------------\n",
+        "# 4. Compile model\n",
+        "# -------------------------------\n",
+        "model.compile(\n",
+        "    optimizer=tf.keras.optimizers.Adam(learning_rate=1e-4),\n",
+        "    loss='binary_crossentropy',\n",
+        "    metrics=['accuracy']\n",
+        ")\n",
+        "\n",
+        "model.summary()\n",
+        "\n",
+        "# -------------------------------\n",
+        "# 5. Train with callbacks\n",
+        "# -------------------------------\n",
+        "from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint\n",
+        "\n",
+        "es_callback = EarlyStopping(\n",
+        "    monitor='val_loss',\n",
+        "    patience=5,\n",
+        "    restore_best_weights=True,\n",
+        "    verbose=1\n",
+        ")\n",
+        "\n",
+        "mc_callback = ModelCheckpoint(\n",
+        "    'best_deepfake_model.keras',\n",
+        "    monitor='val_accuracy',\n",
+        "    save_best_only=True,\n",
+        "    verbose=1\n",
+        ")\n",
+        "\n",
+        "history = model.fit(\n",
+        "    train_ds,\n",
+        "    validation_data=test_ds,\n",
+        "    epochs=50,\n",
+        "    callbacks=[es_callback, mc_callback]\n",
+        ")\n",
+        "\n",
+        "# -------------------------------\n",
+        "# 6. Fine-tuning (optional second phase)\n",
+        "# -------------------------------\n",
+        "base_model.trainable = True\n",
+        "for layer in base_model.layers[:-30]:\n",
+        "    layer.trainable = False\n",
+        "\n",
+        "model.compile(\n",
+        "    optimizer=tf.keras.optimizers.Adam(learning_rate=1e-5),\n",
+        "    loss='binary_crossentropy',\n",
+        "    metrics=['accuracy']\n",
+        ")\n",
+        "\n",
+        "fine_tune_history = model.fit(\n",
+        "    train_ds,\n",
+        "    validation_data=test_ds,\n",
+        "    epochs=20,\n",
+        "    callbacks=[es_callback, mc_callback]\n",
+        ")\n"
+      ],
+      "metadata": {
+        "id": "d8Q4tn3_c3uu",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 211
+        },
+        "outputId": "d0875e1c-566a-407a-94a0-4e16a5278f60"
+      },
+      "execution_count": 1,
+      "outputs": [
+        {
+          "output_type": "error",
+          "ename": "NameError",
+          "evalue": "name 'DATA_DIR' is not defined",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mNameError\u001b[0m                                 Traceback (most recent call last)",
+            "\u001b[0;32m/tmp/ipykernel_649/545388397.py\u001b[0m in \u001b[0;36m<cell line: 0>\u001b[0;34m()\u001b[0m\n\u001b[1;32m      9\u001b[0m \u001b[0;31m# -------------------------------\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     10\u001b[0m train_ds = image_dataset_from_directory(\n\u001b[0;32m---> 11\u001b[0;31m     \u001b[0mDATA_DIR\u001b[0m \u001b[0;34m+\u001b[0m \u001b[0;34m'/Train'\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m     12\u001b[0m     \u001b[0mlabels\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;34m'inferred'\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     13\u001b[0m     \u001b[0mlabel_mode\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;34m'binary'\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;31mNameError\u001b[0m: name 'DATA_DIR' is not defined"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# =========================================================\n",
+        "# FINE-TUNING XCEPTION MODEL (Deepfake Detection)\n",
+        "# =========================================================\n",
+        "import tensorflow as tf\n",
+        "from tensorflow.keras.models import load_model\n",
+        "from tensorflow.keras.optimizers import Adam\n",
+        "from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau\n",
+        "\n",
+        "# ---------------------------------------------------------\n",
+        "# 1️⃣ Load your previously trained (best) model\n",
+        "# ---------------------------------------------------------\n",
+        "model = load_model(\"best_deepfake_model.keras\")\n",
+        "\n",
+        "# ---------------------------------------------------------\n",
+        "# 2️⃣ Unfreeze top layers of Xception for fine-tuning\n",
+        "# ---------------------------------------------------------\n",
+        "# Let's unfreeze the top 30 layers of the Xception base\n",
+        "base_model = model.get_layer(\"xception\")\n",
+        "\n",
+        "# Unfreeze specific layers (e.g., last 30)\n",
+        "for layer in base_model.layers[-30:]:\n",
+        "    layer.trainable = True\n",
+        "\n",
+        "# Verify the change\n",
+        "for i, layer in enumerate(base_model.layers[-35:]):\n",
+        "    print(i, layer.name, \"trainable:\", layer.trainable)\n",
+        "\n",
+        "# ---------------------------------------------------------\n",
+        "# 3️⃣ Recompile with a lower learning rate\n",
+        "# ---------------------------------------------------------\n",
+        "model.compile(\n",
+        "    optimizer=Adam(learning_rate=1e-5),  # smaller LR for fine-tuning\n",
+        "    loss=\"binary_crossentropy\",\n",
+        "    metrics=[\"accuracy\"]\n",
+        ")\n",
+        "\n",
+        "# ---------------------------------------------------------\n",
+        "# 4️⃣ Reload your datasets\n",
+        "# ---------------------------------------------------------\n",
+        "DATA_DIR = \"/content/deepfake-and-real-images/Dataset\"\n",
+        "\n",
+        "train_ds = tf.keras.utils.image_dataset_from_directory(\n",
+        "    DATA_DIR + '/Train',\n",
+        "    image_size=(224, 224),\n",
+        "    batch_size=32\n",
+        ")\n",
+        "\n",
+        "val_ds = tf.keras.utils.image_dataset_from_directory(\n",
+        "    DATA_DIR + '/Test',\n",
+        "    image_size=(224, 224),\n",
+        "    batch_size=32\n",
+        ")\n",
+        "\n",
+        "# Optional performance optimizations\n",
+        "train_ds = train_ds.prefetch(tf.data.AUTOTUNE)\n",
+        "val_ds = val_ds.prefetch(tf.data.AUTOTUNE)\n",
+        "\n",
+        "# ---------------------------------------------------------\n",
+        "# 5️⃣ Add callbacks for fine-tuning stability\n",
+        "# ---------------------------------------------------------\n",
+        "checkpoint_cb = ModelCheckpoint(\n",
+        "    \"fine_tuned_deepfake_model.keras\",\n",
+        "    monitor=\"val_accuracy\",\n",
+        "    save_best_only=True,\n",
+        "    mode=\"max\"\n",
+        ")\n",
+        "\n",
+        "earlystop_cb = EarlyStopping(\n",
+        "    monitor=\"val_accuracy\",\n",
+        "    patience=5,\n",
+        "    restore_best_weights=True\n",
+        ")\n",
+        "\n",
+        "reduce_lr_cb = ReduceLROnPlateau(\n",
+        "    monitor=\"val_loss\",\n",
+        "    factor=0.2,\n",
+        "    patience=3,\n",
+        "    verbose=1\n",
+        ")\n",
+        "\n",
+        "# ---------------------------------------------------------\n",
+        "# 6️⃣ Train the model (fine-tuning)\n",
+        "# ---------------------------------------------------------\n",
+        "fine_tune_epochs = 20\n",
+        "\n",
+        "history_fine = model.fit(\n",
+        "    train_ds,\n",
+        "    validation_data=val_ds,\n",
+        "    epochs=fine_tune_epochs,\n",
+        "    callbacks=[checkpoint_cb, earlystop_cb, reduce_lr_cb]\n",
+        ")\n",
+        "\n",
+        "# ---------------------------------------------------------\n",
+        "# 7️⃣ Evaluate the fine-tuned model\n",
+        "# ---------------------------------------------------------\n",
+        "loss, acc = model.evaluate(val_ds)\n",
+        "print(f\"✅ Fine-tuned model accuracy: {acc:.4f}\")"
+      ],
+      "metadata": {
+        "id": "qE3DxFZoVz52",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 367
+        },
+        "outputId": "94c56484-c66b-4886-a5b9-2653641ad5a6"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "error",
+          "ename": "ValueError",
+          "evalue": "File not found: filepath=best_deepfake_model.keras. Please ensure the file is an accessible `.keras` zip file.",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mValueError\u001b[0m                                Traceback (most recent call last)",
+            "\u001b[0;32m/tmp/ipython-input-221285411.py\u001b[0m in \u001b[0;36m<cell line: 0>\u001b[0;34m()\u001b[0m\n\u001b[1;32m     10\u001b[0m \u001b[0;31m# 1️⃣ Load your previously trained (best) model\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     11\u001b[0m \u001b[0;31m# ---------------------------------------------------------\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m---> 12\u001b[0;31m \u001b[0mmodel\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mload_model\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"best_deepfake_model.keras\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m     13\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     14\u001b[0m \u001b[0;31m# ---------------------------------------------------------\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.12/dist-packages/keras/src/saving/saving_api.py\u001b[0m in \u001b[0;36mload_model\u001b[0;34m(filepath, custom_objects, compile, safe_mode)\u001b[0m\n\u001b[1;32m    198\u001b[0m         )\n\u001b[1;32m    199\u001b[0m     \u001b[0;32melif\u001b[0m \u001b[0mstr\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mfilepath\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mendswith\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\".keras\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 200\u001b[0;31m         raise ValueError(\n\u001b[0m\u001b[1;32m    201\u001b[0m             \u001b[0;34mf\"File not found: filepath={filepath}. \"\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    202\u001b[0m             \u001b[0;34m\"Please ensure the file is an accessible `.keras` \"\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;31mValueError\u001b[0m: File not found: filepath=best_deepfake_model.keras. Please ensure the file is an accessible `.keras` zip file."
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install tensorflow keras opencv-python Pillow piexif exifread pillow-heif python-magic\n"
+      ],
+      "metadata": {
+        "id": "0sIC0udsngm9"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import cv2\n",
+        "import numpy as np\n",
+        "import matplotlib.pyplot as plt\n",
+        "from keras.models import load_model\n",
+        "from PIL import Image\n",
+        "import piexif, exifread, magic, os\n",
+        "from io import BytesIO\n"
+      ],
+      "metadata": {
+        "id": "7zv_zbCknmBF"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Path to uploaded image (replace with your image path)\n",
+        "image_path = '/content/DeepFake_pic.jpg'\n",
+        "\n",
+        "# Load image with OpenCV\n",
+        "img = cv2.imread(image_path)\n",
+        "img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)\n",
+        "\n",
+        "plt.imshow(img_rgb)\n",
+        "plt.axis('off')\n",
+        "plt.title(\"Input Image\")\n",
+        "plt.show()\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 211
+        },
+        "id": "i1wdH1mVn2LG",
+        "outputId": "644732c7-23e9-4c86-9f0e-38d0e6f8926c"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "error",
+          "ename": "NameError",
+          "evalue": "name 'cv2' is not defined",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mNameError\u001b[0m                                 Traceback (most recent call last)",
+            "\u001b[0;32m/tmp/ipython-input-3389478763.py\u001b[0m in \u001b[0;36m<cell line: 0>\u001b[0;34m()\u001b[0m\n\u001b[1;32m      3\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      4\u001b[0m \u001b[0;31m# Load image with OpenCV\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 5\u001b[0;31m \u001b[0mimg\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mcv2\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mimread\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mimage_path\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      6\u001b[0m \u001b[0mimg_rgb\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mcv2\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mcvtColor\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mimg\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mcv2\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mCOLOR_BGR2RGB\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      7\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;31mNameError\u001b[0m: name 'cv2' is not defined"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from tensorflow.keras.applications.xception import preprocess_input\n",
+        "\n",
+        "# Resize and preprocess\n",
+        "img_resized = cv2.resize(img_rgb, (299, 299))\n",
+        "img_array = np.expand_dims(img_resized, axis=0)\n",
+        "img_preprocessed = preprocess_input(img_array)\n"
+      ],
+      "metadata": {
+        "id": "BpuGUA0Cn6NM"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Load pretrained model (update path to your trained .h5 model)\n",
+        "model_path = '/content/best_deepfake_model.keras'\n",
+        "model = load_model(model_path)\n",
+        "\n",
+        "print(\"✅ Model loaded successfully.\")"
+      ],
+      "metadata": {
+        "id": "qKVAeQnioBt2"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "prediction = model.predict(img_preprocessed)[0][0]\n",
+        "label = \"FAKE\" if prediction > 0.5 else \"REAL\"\n",
+        "confidence = prediction if prediction > 0.5 else 1 - prediction\n",
+        "\n",
+        "print(f\"Prediction: {label} ({confidence*100:.2f}% confidence)\")\n",
+        "\n",
+        "plt.imshow(img_rgb)\n",
+        "plt.axis('off')\n",
+        "plt.title(f\"Result: {label} ({confidence*100:.2f}% confidence)\")\n",
+        "plt.show()\n"
+      ],
+      "metadata": {
+        "id": "uDd3bCmQoE2E"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "def analyze_metadata(image_path):\n",
+        "    print(\"\\n🧾 EXIF Metadata Extraction\\n\" + \"-\"*40)\n",
+        "\n",
+        "    # Read metadata using exifread\n",
+        "    with open(image_path, 'rb') as f:\n",
+        "        tags = exifread.process_file(f)\n",
+        "\n",
+        "    if not tags:\n",
+        "        print(\"No EXIF metadata found.\")\n",
+        "    else:\n",
+        "        for tag in tags.keys():\n",
+        "            if \"Date\" in tag or \"Make\" in tag or \"Model\" in tag or \"Software\" in tag:\n",
+        "                print(f\"{tag}: {tags[tag]}\")\n",
+        "\n",
+        "    # File type check\n",
+        "    file_type = magic.from_file(image_path, mime=True)\n",
+        "    print(f\"\\n📄 File Type Detected: {file_type}\")\n",
+        "\n",
+        "    # Check if file has embedded thumbnails or GPS\n",
+        "    try:\n",
+        "        exif_dict = piexif.load(image_path)\n",
+        "        gps = exif_dict.get('GPS', {})\n",
+        "        if gps:\n",
+        "            print(\"🌍 GPS metadata found (possible geolocation data).\")\n",
+        "        else:\n",
+        "            print(\"No GPS data detected.\")\n",
+        "    except Exception as e:\n",
+        "        print(\"Could not parse EXIF with piexif:\", e)\n"
+      ],
+      "metadata": {
+        "id": "Nq92VS9coK8P"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "print(\"\\n=== Digital Forensics Report ===\")\n",
+        "print(f\"🧠 Model Verdict: {label} ({confidence*100:.2f}%)\")\n",
+        "\n",
+        "# Run forensic metadata analysis\n",
+        "analyze_metadata(image_path)\n",
+        "\n",
+        "# Add Error Level Analysis (ELA)\n",
+        "print(\"\\n👁️ Error Level Analysis (ELA)\\n\" + \"-\"*40)\n",
+        "ela_img = error_level_analysis(image_path)\n",
+        "plt.imshow(ela_img)\n",
+        "plt.axis('off')\n",
+        "plt.title(\"Error Level Analysis (ELA)\")\n",
+        "plt.show()\n",
+        "\n",
+        "\n",
+        "# Future expansion: call other forensic tools (NoiseMap, Hash analysis)"
+      ],
+      "metadata": {
+        "id": "dlCfcgFAoQWC"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from PIL import ImageChops, ImageEnhance\n",
+        "\n",
+        "def error_level_analysis(image_path, scale=10):\n",
+        "    image = Image.open(image_path).convert('RGB')\n",
+        "    temp = BytesIO()\n",
+        "    image.save(temp, 'JPEG', quality=90)\n",
+        "    temp.seek(0)\n",
+        "    recompressed = Image.open(temp)\n",
+        "    diff = ImageChops.difference(image, recompressed)\n",
+        "    diff = ImageEnhance.Brightness(diff).enhance(scale)\n",
+        "    return diff\n",
+        "\n",
+        "ela_img = error_level_analysis(image_path)\n",
+        "plt.imshow(ela_img)\n",
+        "plt.axis('off')\n",
+        "plt.title(\"Error Level Analysis (ELA)\")\n",
+        "plt.show()\n"
+      ],
+      "metadata": {
+        "id": "qBgHj7CuoT6t"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "def run_full_analysis(image_path):\n",
+        "    # Step 1: Predict\n",
+        "    img = cv2.imread(image_path)\n",
+        "    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)\n",
+        "    img_resized = cv2.resize(img_rgb, (299, 299))\n",
+        "    img_pre = np.expand_dims(preprocess_input(img_resized), axis=0)\n",
+        "    pred = model.predict(img_pre)[0][0]\n",
+        "    label = \"FAKE\" if pred > 0.5 else \"REAL\"\n",
+        "    conf = pred if pred > 0.5 else 1 - pred\n",
+        "\n",
+        "    # Step 2: Display\n",
+        "    plt.imshow(img_rgb)\n",
+        "    plt.axis('off')\n",
+        "    plt.title(f\"Deepfake Detector: {label} ({conf*100:.2f}%)\")\n",
+        "    plt.show()\n",
+        "\n",
+        "    # Step 3: Forensics\n",
+        "    analyze_metadata(image_path)\n",
+        "    ela_img = error_level_analysis(image_path)\n",
+        "    plt.imshow(ela_img)\n",
+        "    plt.axis('off')\n",
+        "    plt.title(\"Error Level Analysis (ELA)\")\n",
+        "    plt.show()\n",
+        "\n",
+        "run_full_analysis('/content/DeepFake_pic.jpg')\n"
+      ],
+      "metadata": {
+        "id": "CNZf-JL8oZGw"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install gradio\n",
+        "\n",
+        "import gradio as gr\n",
+        "import cv2\n",
+        "import numpy as np\n",
+        "from tensorflow.keras.applications.xception import preprocess_input\n",
+        "from tensorflow.keras.models import load_model # Import load_model here\n",
+        "\n",
+        "\n",
+        "# Load pretrained model outside the function\n",
+        "model_path = '/content/best_deepfake_model.keras' # Update path to your trained .h5 model\n",
+        "model = load_model(model_path)\n",
+        "\n",
+        "\n",
+        "def deepfake_analyzer(image, model):\n",
+        "    # Save uploaded image temporarily\n",
+        "    temp_path = \"/content/temp_image.jpg\"\n",
+        "    image.save(temp_path)\n",
+        "\n",
+        "    # Prediction\n",
+        "    img = cv2.imread(temp_path)\n",
+        "    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)\n",
+        "    img_resized = cv2.resize(img_rgb, (299, 299))\n",
+        "    img_pre = np.expand_dims(preprocess_input(img_resized), axis=0)\n",
+        "    pred = model.predict(img_pre)[0][0]\n",
+        "    label = \"FAKE\" if pred > 0.5 else \"REAL\"\n",
+        "    conf = pred if pred > 0.5 else 1 - pred\n",
+        "\n",
+        "    # Return labeled image and prediction text\n",
+        "    return img_rgb, f\"Prediction: {label} ({conf*100:.2f}%)\"\n",
+        "\n",
+        "interface = gr.Interface(\n",
+        "    fn=lambda x: deepfake_analyzer(x, model), # Pass the model to the function\n",
+        "    inputs=gr.Image(type=\"pil\"),\n",
+        "    outputs=[\"image\", \"text\"],\n",
+        "    title=\"Deepfake Detection Demo\",\n",
+        "    description=\"Upload an image to test authenticity using the Xception model.\"\n",
+        ")\n",
+        "\n",
+        "interface.launch(debug=True)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 1000
+        },
+        "id": "KxyU0PZIpbrm",
+        "outputId": "5456a33e-8529-4669-cfc5-5193412fb7db"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Requirement already satisfied: gradio in /usr/local/lib/python3.12/dist-packages (5.50.0)\n",
+            "Requirement already satisfied: aiofiles<25.0,>=22.0 in /usr/local/lib/python3.12/dist-packages (from gradio) (24.1.0)\n",
+            "Requirement already satisfied: anyio<5.0,>=3.0 in /usr/local/lib/python3.12/dist-packages (from gradio) (4.12.1)\n",
+            "Requirement already satisfied: brotli>=1.1.0 in /usr/local/lib/python3.12/dist-packages (from gradio) (1.2.0)\n",
+            "Requirement already satisfied: fastapi<1.0,>=0.115.2 in /usr/local/lib/python3.12/dist-packages (from gradio) (0.129.0)\n",
+            "Requirement already satisfied: ffmpy in /usr/local/lib/python3.12/dist-packages (from gradio) (1.0.0)\n",
+            "Requirement already satisfied: gradio-client==1.14.0 in /usr/local/lib/python3.12/dist-packages (from gradio) (1.14.0)\n",
+            "Requirement already satisfied: groovy~=0.1 in /usr/local/lib/python3.12/dist-packages (from gradio) (0.1.2)\n",
+            "Requirement already satisfied: httpx<1.0,>=0.24.1 in /usr/local/lib/python3.12/dist-packages (from gradio) (0.28.1)\n",
+            "Requirement already satisfied: huggingface-hub<2.0,>=0.33.5 in /usr/local/lib/python3.12/dist-packages (from gradio) (1.4.1)\n",
+            "Requirement already satisfied: jinja2<4.0 in /usr/local/lib/python3.12/dist-packages (from gradio) (3.1.6)\n",
+            "Requirement already satisfied: markupsafe<4.0,>=2.0 in /usr/local/lib/python3.12/dist-packages (from gradio) (3.0.3)\n",
+            "Requirement already satisfied: numpy<3.0,>=1.0 in /usr/local/lib/python3.12/dist-packages (from gradio) (2.0.2)\n",
+            "Requirement already satisfied: orjson~=3.0 in /usr/local/lib/python3.12/dist-packages (from gradio) (3.11.7)\n",
+            "Requirement already satisfied: packaging in /usr/local/lib/python3.12/dist-packages (from gradio) (26.0)\n",
+            "Requirement already satisfied: pandas<3.0,>=1.0 in /usr/local/lib/python3.12/dist-packages (from gradio) (2.2.2)\n",
+            "Requirement already satisfied: pillow<12.0,>=8.0 in /usr/local/lib/python3.12/dist-packages (from gradio) (11.3.0)\n",
+            "Requirement already satisfied: pydantic<=2.12.3,>=2.0 in /usr/local/lib/python3.12/dist-packages (from gradio) (2.12.3)\n",
+            "Requirement already satisfied: pydub in /usr/local/lib/python3.12/dist-packages (from gradio) (0.25.1)\n",
+            "Requirement already satisfied: python-multipart>=0.0.18 in /usr/local/lib/python3.12/dist-packages (from gradio) (0.0.22)\n",
+            "Requirement already satisfied: pyyaml<7.0,>=5.0 in /usr/local/lib/python3.12/dist-packages (from gradio) (6.0.3)\n",
+            "Requirement already satisfied: ruff>=0.9.3 in /usr/local/lib/python3.12/dist-packages (from gradio) (0.15.1)\n",
+            "Requirement already satisfied: safehttpx<0.2.0,>=0.1.6 in /usr/local/lib/python3.12/dist-packages (from gradio) (0.1.7)\n",
+            "Requirement already satisfied: semantic-version~=2.0 in /usr/local/lib/python3.12/dist-packages (from gradio) (2.10.0)\n",
+            "Requirement already satisfied: starlette<1.0,>=0.40.0 in /usr/local/lib/python3.12/dist-packages (from gradio) (0.52.1)\n",
+            "Requirement already satisfied: tomlkit<0.14.0,>=0.12.0 in /usr/local/lib/python3.12/dist-packages (from gradio) (0.13.3)\n",
+            "Requirement already satisfied: typer<1.0,>=0.12 in /usr/local/lib/python3.12/dist-packages (from gradio) (0.24.0)\n",
+            "Requirement already satisfied: typing-extensions~=4.0 in /usr/local/lib/python3.12/dist-packages (from gradio) (4.15.0)\n",
+            "Requirement already satisfied: uvicorn>=0.14.0 in /usr/local/lib/python3.12/dist-packages (from gradio) (0.41.0)\n",
+            "Requirement already satisfied: fsspec in /usr/local/lib/python3.12/dist-packages (from gradio-client==1.14.0->gradio) (2025.3.0)\n",
+            "Requirement already satisfied: websockets<16.0,>=13.0 in /usr/local/lib/python3.12/dist-packages (from gradio-client==1.14.0->gradio) (15.0.1)\n",
+            "Requirement already satisfied: idna>=2.8 in /usr/local/lib/python3.12/dist-packages (from anyio<5.0,>=3.0->gradio) (3.11)\n",
+            "Requirement already satisfied: typing-inspection>=0.4.2 in /usr/local/lib/python3.12/dist-packages (from fastapi<1.0,>=0.115.2->gradio) (0.4.2)\n",
+            "Requirement already satisfied: annotated-doc>=0.0.2 in /usr/local/lib/python3.12/dist-packages (from fastapi<1.0,>=0.115.2->gradio) (0.0.4)\n",
+            "Requirement already satisfied: certifi in /usr/local/lib/python3.12/dist-packages (from httpx<1.0,>=0.24.1->gradio) (2026.1.4)\n",
+            "Requirement already satisfied: httpcore==1.* in /usr/local/lib/python3.12/dist-packages (from httpx<1.0,>=0.24.1->gradio) (1.0.9)\n",
+            "Requirement already satisfied: h11>=0.16 in /usr/local/lib/python3.12/dist-packages (from httpcore==1.*->httpx<1.0,>=0.24.1->gradio) (0.16.0)\n",
+            "Requirement already satisfied: filelock in /usr/local/lib/python3.12/dist-packages (from huggingface-hub<2.0,>=0.33.5->gradio) (3.24.2)\n",
+            "Requirement already satisfied: hf-xet<2.0.0,>=1.2.0 in /usr/local/lib/python3.12/dist-packages (from huggingface-hub<2.0,>=0.33.5->gradio) (1.2.0)\n",
+            "Requirement already satisfied: shellingham in /usr/local/lib/python3.12/dist-packages (from huggingface-hub<2.0,>=0.33.5->gradio) (1.5.4)\n",
+            "Requirement already satisfied: tqdm>=4.42.1 in /usr/local/lib/python3.12/dist-packages (from huggingface-hub<2.0,>=0.33.5->gradio) (4.67.3)\n",
+            "Requirement already satisfied: typer-slim in /usr/local/lib/python3.12/dist-packages (from huggingface-hub<2.0,>=0.33.5->gradio) (0.24.0)\n",
+            "Requirement already satisfied: python-dateutil>=2.8.2 in /usr/local/lib/python3.12/dist-packages (from pandas<3.0,>=1.0->gradio) (2.9.0.post0)\n",
+            "Requirement already satisfied: pytz>=2020.1 in /usr/local/lib/python3.12/dist-packages (from pandas<3.0,>=1.0->gradio) (2025.2)\n",
+            "Requirement already satisfied: tzdata>=2022.7 in /usr/local/lib/python3.12/dist-packages (from pandas<3.0,>=1.0->gradio) (2025.3)\n",
+            "Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.12/dist-packages (from pydantic<=2.12.3,>=2.0->gradio) (0.7.0)\n",
+            "Requirement already satisfied: pydantic-core==2.41.4 in /usr/local/lib/python3.12/dist-packages (from pydantic<=2.12.3,>=2.0->gradio) (2.41.4)\n",
+            "Requirement already satisfied: click>=8.2.1 in /usr/local/lib/python3.12/dist-packages (from typer<1.0,>=0.12->gradio) (8.3.1)\n",
+            "Requirement already satisfied: rich>=12.3.0 in /usr/local/lib/python3.12/dist-packages (from typer<1.0,>=0.12->gradio) (13.9.4)\n",
+            "Requirement already satisfied: six>=1.5 in /usr/local/lib/python3.12/dist-packages (from python-dateutil>=2.8.2->pandas<3.0,>=1.0->gradio) (1.17.0)\n",
+            "Requirement already satisfied: markdown-it-py>=2.2.0 in /usr/local/lib/python3.12/dist-packages (from rich>=12.3.0->typer<1.0,>=0.12->gradio) (4.0.0)\n",
+            "Requirement already satisfied: pygments<3.0.0,>=2.13.0 in /usr/local/lib/python3.12/dist-packages (from rich>=12.3.0->typer<1.0,>=0.12->gradio) (2.19.2)\n",
+            "Requirement already satisfied: mdurl~=0.1 in /usr/local/lib/python3.12/dist-packages (from markdown-it-py>=2.2.0->rich>=12.3.0->typer<1.0,>=0.12->gradio) (0.1.2)\n"
+          ]
+        },
+        {
+          "output_type": "error",
+          "ename": "ValueError",
+          "evalue": "File not found: filepath=/content/best_deepfake_model.keras. Please ensure the file is an accessible `.keras` zip file.",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mValueError\u001b[0m                                Traceback (most recent call last)",
+            "\u001b[0;32m/tmp/ipython-input-3637137972.py\u001b[0m in \u001b[0;36m<cell line: 0>\u001b[0;34m()\u001b[0m\n\u001b[1;32m     10\u001b[0m \u001b[0;31m# Load pretrained model outside the function\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     11\u001b[0m \u001b[0mmodel_path\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0;34m'/content/best_deepfake_model.keras'\u001b[0m \u001b[0;31m# Update path to your trained .h5 model\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m---> 12\u001b[0;31m \u001b[0mmodel\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mload_model\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mmodel_path\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m     13\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     14\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.12/dist-packages/keras/src/saving/saving_api.py\u001b[0m in \u001b[0;36mload_model\u001b[0;34m(filepath, custom_objects, compile, safe_mode)\u001b[0m\n\u001b[1;32m    198\u001b[0m         )\n\u001b[1;32m    199\u001b[0m     \u001b[0;32melif\u001b[0m \u001b[0mstr\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mfilepath\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mendswith\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\".keras\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 200\u001b[0;31m         raise ValueError(\n\u001b[0m\u001b[1;32m    201\u001b[0m             \u001b[0;34mf\"File not found: filepath={filepath}. \"\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    202\u001b[0m             \u001b[0;34m\"Please ensure the file is an accessible `.keras` \"\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;31mValueError\u001b[0m: File not found: filepath=/content/best_deepfake_model.keras. Please ensure the file is an accessible `.keras` zip file."
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "eeca27ef"
+      },
+      "source": [
+        "# Task\n",
+        "ls -la ./"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "fb085469"
+      },
+      "source": [
+        "## Verify Model Saving and Location\n",
+        "\n",
+        "### Subtask:\n",
+        "The `best_deepfake_model.keras` file was not found during subsequent steps. This step will check the current directory to see if the model file was actually created and where it is located. We will add a command to list the contents of the current directory to diagnose the issue.\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "49c89158"
+      },
+      "source": [
+        "**Reasoning**:\n",
+        "To diagnose the issue of the missing model file, I will list the contents of the current directory using the specified shell command. This will help verify if the file was created and its exact location.\n",
+        "\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "6a8ee8fa",
+        "outputId": "15ebd96e-6b81-4519-9c52-32816eadf974"
+      },
+      "source": [
+        "import os\n",
+        "print(os.listdir('.'))"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "metadata": {
+            "tags": null
+          },
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "['.config', 'sample_data']\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "5c628eb8"
+      },
+      "source": [
+        "**Reasoning**:\n",
+        "The previous code block used `os.listdir('.')` which does not provide the 'long format' output equivalent to `ls -la ./`. To precisely follow the instruction of listing contents including hidden files and directories in a long format, a shell command is required.\n",
+        "\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "52870d34",
+        "outputId": "7ca4d05a-632f-4d26-b606-be385231d0c9"
+      },
+      "source": [
+        "print(os.listdir('.'))"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "['.config', 'sample_data']\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "87dec48d"
+      },
+      "source": [
+        "**Reasoning**:\n",
+        "To accurately fulfill the subtask of listing directory contents in a 'long format' including hidden files, I will use a shell command `!ls -la .` as the previous Python `os.listdir('.')` did not provide the required detailed output.\n",
+        "\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "2d5c43e6",
+        "outputId": "31a98fe2-5fa4-42ed-a687-1cf060cbbcc0"
+      },
+      "source": [
+        "!ls -la ."
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "total 16\n",
+            "drwxr-xr-x 1 root root 4096 Feb  6 14:31 .\n",
+            "drwxr-xr-x 1 root root 4096 Feb 26 11:38 ..\n",
+            "drwxr-xr-x 4 root root 4096 Feb  6 14:31 .config\n",
+            "drwxr-xr-x 1 root root 4096 Feb  6 14:31 sample_data\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
